@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(muduo_test)
+project(chatserver)
 
 set(CMAKE_cxx_FLAGS ${CMAKE_cxx_FLAGS} -g)
 
