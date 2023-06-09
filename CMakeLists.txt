@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(chatserver)
+project(chat)
 
+#配置编译选项
 set(CMAKE_cxx_FLAGS ${CMAKE_cxx_FLAGS} -g)
 
+#配置最终可执行文件输出路径
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
+#配置头文件搜索路径
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include/server)
+
 # 指定搜索的子目录
-add_subdirectory(test)
+add_subdirectory(src)
