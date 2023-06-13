@@ -16,11 +16,47 @@ ChatService::ChatService()
     _msgHandlerMap.insert({LOGIN_MSG, std::bind(&ChatService::login, this, _1, _2, _3)});
     _msgHandlerMap.insert({REG_MSG, std::bind(&ChatService::reg, this, _1, _2, _3)});
 }
-// 处理登录业务
+// 处理登录业务 id pwd
 void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
-{
-    LOG_INFO << "do login service!";
+{ // 调用get方法，将字符串类型转换为整型
+    int id = js["id"].get<int>();
+    string pwd = js["password"];
+
+    User user = _userModel.query(id);
+    if (user.getId() == id && user.getPwd() == pwd)
+    {
+        if (user.getState() == "online")
+        { // 该用户已经登录，不允许重复登录
+            json response;
+            response["msgid"] = LOGIN_MSG_ACK;
+            response["errno"] = 2;
+            response["errmsg"] = "该账号已经登录，请重新输入新账号";
+            conn->send(response.dump());
+        }
+        else
+        { // 登录成功， 更新用户状态信息state offline => online
+            user.setState("online");
+            _userModel.updateState(user);
+
+            json response;
+            response["msgid"] = LOGIN_MSG_ACK;
+            response["errno"] = 0;
+            response["id"] = user.getId();
+            response["name"] = user.getName();
+            // json::dump() 将序列化信息转换为std::string
+            conn->send(response.dump());
+        }
+    }
+    else
+    { // 该用户不存在或密码错误，登录失败
+        json response;
+        response["msgid"] = LOGIN_MSG_ACK;
+        response["errno"] = 1;
+        response["errmsg"] = "该用户不存在或密码错误，登录失败";
+        conn->send(response.dump());
+    }
 }
+
 // 处理注册业务 name password
 void ChatService::reg(const TcpConnectionPtr &conn, json &js, Timestamp time)
 {
@@ -49,10 +85,11 @@ void ChatService::reg(const TcpConnectionPtr &conn, json &js, Timestamp time)
         conn->send(response.dump());
     }
 }
+
 // 获取消息对应的处理器
 MsgHandler ChatService::getHandler(int msgid)
 {
-    // 记录错误日志， msgid没有对应的事件处理回调
+    // 记录错误日志，msgid没有对应的事件处理回调
     auto it = _msgHandlerMap.find(msgid);
     if (it == _msgHandlerMap.end())
     {
