@@ -34,7 +34,14 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
             conn->send(response.dump());
         }
         else
-        { // 登录成功， 更新用户状态信息state offline => online
+        { 
+            // 登录成功，记录用户连接信息
+            {
+                lock_guard<mutex> lock(_connMutex);
+                _userConnMap.insert({id, conn});
+            }
+
+            // 登录成功， 更新用户状态信息state offline => online
             user.setState("online");
             _userModel.updateState(user);
 
