@@ -124,6 +124,13 @@ MsgHandler ChatService::getHandler(int msgid)
     }
 }
 
+// 服务器异常，业务重置方法
+void ChatService::reset()
+{
+    // 把online状态的用户，设置成offline
+    _userModel.resetState();
+}
+
 // 处理客户端异常退出
 void ChatService::clientCloseException(const TcpConnectionPtr &conn)
 {
