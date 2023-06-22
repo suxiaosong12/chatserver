@@ -1,12 +1,13 @@
 #include "chatserver.hpp"
 #include "json.hpp"
 #include "chatservice.hpp"
-using json = nlohmann::json;
 
+#include <iostream>
 #include <functional>
 #include <string>
 using namespace std;
 using namespace placeholders;
+using json = nlohmann::json;
 
 // 初始化聊天服务器对象
 ChatServer::ChatServer(EventLoop *loop,
@@ -33,7 +34,7 @@ void ChatServer::start()
 // 上报链接相关信息的回调函数
 void ChatServer::onConnection(const TcpConnectionPtr &conn)
 {
-    //客户端断开链接
+    // 客户端断开链接
     if (!conn->connected())
     {
         ChatService::instance()->clientCloseException(conn);
@@ -47,6 +48,10 @@ void ChatServer::onMessage(const TcpConnectionPtr &conn,
                            Timestamp time)
 {
     string buf = buffer->retrieveAllAsString();
+
+    // 测试，添加json打印代码
+    cout << buf << endl;
+
     // 数据的反序列化
     json js = json::parse(buf);
     // 达到的目的：完全解耦网络模块的代码和业务模块的代码

@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include <iostream>
+#include <string>
 using namespace std;
 
 // User表的ORM类
@@ -26,7 +26,7 @@ public:
     string getPwd() { return this->password; }
     string getState() { return this->state; }
 
-private:
+protected:
     int id;
     string name;
     string password;

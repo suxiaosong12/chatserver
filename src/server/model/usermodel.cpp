@@ -1,13 +1,14 @@
 #include "usermodel.hpp"
 #include "db.h"
 #include <iostream>
+using namespace std;
 
 // User表的增加方法
 bool UserModel::insert(User &user)
 {
     // 1.组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "insert into user(name,  password, state) values('%s', '%s', '%s')",
+    sprintf(sql, "insert into user(name, password, state) values('%s', '%s', '%s')",
             user.getName().c_str(), user.getPwd().c_str(), user.getState().c_str());
 
     MySQL mysql;
@@ -45,7 +46,6 @@ User UserModel::query(int id)
                 user.setName(row[1]);
                 user.setPwd(row[2]);
                 user.setState(row[3]);
-
                 mysql_free_result(res);
                 return user;
             }
@@ -55,13 +55,12 @@ User UserModel::query(int id)
     return User();
 }
 
-// 更新用户状态信息
+// 更新用户的状态信息
 bool UserModel::updateState(User user)
 {
     // 1.组装sql语句
     char sql[1024] = {0};
-
-    sprintf(sql, "update user set state = '%s' where id = '%d'", user.getState().c_str(), user.getId());
+    sprintf(sql, "update user set state = '%s' where id = %d", user.getState().c_str(), user.getId());
 
     MySQL mysql;
     if (mysql.connect())
@@ -71,7 +70,6 @@ bool UserModel::updateState(User user)
             return true;
         }
     }
-
     return false;
 }
 

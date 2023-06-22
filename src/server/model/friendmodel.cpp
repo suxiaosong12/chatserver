@@ -6,7 +6,7 @@ void FriendModel::insert(int userid, int friendid)
 {
     // 1.组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "insert into friend values('%d', '%d')", userid, friendid);
+    sprintf(sql, "insert into friend values(%d, %d)", userid, friendid);
 
     MySQL mysql;
     if (mysql.connect())
@@ -19,8 +19,9 @@ void FriendModel::insert(int userid, int friendid)
 vector<User> FriendModel::query(int userid)
 {
     // 1.组装sql语句
-    char sql[1024] = {0}; 
-    sprintf(sql, "select a.id, a.name, a.state from user a inner join friend b on b.friendid = a.id where b.userid = %d", userid);
+    char sql[1024] = {0};
+
+    sprintf(sql, "select a.id, a.name, a.state from user a inner join friend b on b.friendid = a.id where b.userid=%d", userid);
 
     vector<User> vec;
     MySQL mysql;
@@ -31,7 +32,7 @@ vector<User> FriendModel::query(int userid)
         {
             // 把userid用户的所有离线消息放入vec中返回
             MYSQL_ROW row;
-            while((row = mysql_fetch_row(res)) != nullptr)
+            while ((row = mysql_fetch_row(res)) != nullptr)
             {
                 User user;
                 user.setId(atoi(row[0]));
@@ -39,7 +40,6 @@ vector<User> FriendModel::query(int userid)
                 user.setState(row[2]);
                 vec.push_back(user);
             }
-
             mysql_free_result(res);
             return vec;
         }
